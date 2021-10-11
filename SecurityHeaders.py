@@ -84,7 +84,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(usage='''
     python %s URL {-jwt eyJraWQiOi...} 
 
-    Security Headers checks if a recommended security header is missing from serer response.
+    Security Headers checks if a recommended security header is missing from responses.
 
     Use -h or --help flag to get help
     ''' % src_name)
