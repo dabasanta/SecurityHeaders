@@ -17,6 +17,8 @@ error="\e[1m\e[91m[!]"
 question="\e[1m\e[93m[?]"
 green="\e[1m\e[92m"
 
+echo -e "Content-Security-Policy\nX-Content-Type-Options\nX-Frame-Options\nX-XSS-Protection" > /tmp/sh.txt
+
 tput civis  # Making beep off
 
 clean(){  # Cleaning the system after execution
@@ -34,7 +36,6 @@ function scape() {  # Catch the ctrl_c INT key
 trap scape INT
 
 help(){
-
   columns=$(stty -a | head -1 | cut -d ';' -f 3 | grep -Eo '[0-9]+')
   if [ $columns -ge 164 ] ; then
     echo -e "\e[1m\e[91m
@@ -159,8 +160,20 @@ checkDependencies(){
 securityHeaders(){
   host="$1"
   curl -LIs --max-redirs 5 -X GET "$host" -o /tmp/curl.output 2>/dev/null
-  echo -e "\n\e[1m\e[93m [*] Results for $host$end\n"
-  cat /tmp/curl.output | cut -d : -f 1 | grep -Eiw 'Content-Security-Policy|X-Content-Type-Options|X-Frame-Options|X-XSS-Protection' | uniq
+  echo -e "\n\e[1m [*] Results for $host$end\n"
+  cat /tmp/curl.output | cut -d : -f 1 | grep -Eiw 'Content-Security-Policy|X-Content-Type-Options|X-Frame-Options|X-XSS-Protection' | uniq > /tmp/hi.txt
+
+  for header in $(cat /tmp/sh.txt)
+  do
+    grep -Eiw $header /tmp/hi.txt > /dev/null 2>&1
+    if [ $? -eq 0 ] ; then
+      echo -e "[\e[1m\e[92m!  found  !$end] \t\t $header"
+    else
+      echo -e "[\e[1m\e[91m! missing !$end] \t\t $header]"
+    fi
+  done
+
+  echo -e "\n"
 }
 
 checkConn(){
